@@ -2,27 +2,38 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <vector>
+#include <string>
 
-void FileReader::readFile(const std::string &filename, std::vector<Student> &students) {
+void FileReader::readFile(const std::string& filename, std::vector<Student>& students) {
     std::ifstream file(filename);
-    if (!file) throw std::runtime_error("ERROR: Cannot open file " + filename);
+    if (!file.is_open()) throw std::runtime_error("Cannot open file: " + filename);
 
     std::string line;
-
     while (std::getline(file, line)) {
-        std::stringstream ss(line);
-        std::string fn, ln;
-        int value;
+        std::istringstream iss(line);
+        std::string token;
 
-        if (!(ss >> fn >> ln)) continue;
+        // Parse ID
+        std::getline(iss, token, ',');
+        int id = std::stoi(token);
 
-        std::vector<int> hw;
-        while (ss >> value) hw.push_back(value);
+        // Parse name
+        std::getline(iss, token, ',');
+        std::string name = token;
 
-        int exam = hw.back();
-        hw.pop_back();
+        // Parse homework grades
+        std::vector<double> hw;
+        for (int i = 0; i < 3; ++i) { // assume 3 homework grades
+            std::getline(iss, token, ',');
+            hw.push_back(std::stod(token));
+        }
 
-        Student st(fn, ln);
+        // Parse exam grade
+        std::getline(iss, token, ',');
+        double exam = std::stod(token);
+
+        Student st(id, name);
         st.setHomework(hw);
         st.setExam(exam);
         st.calculateFinalGrade();

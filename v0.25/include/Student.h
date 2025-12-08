@@ -4,29 +4,32 @@
 #include <string>
 #include <vector>
 
-class Student {
-private:
-    std::string firstName;
-    std::string lastName;
-    std::vector<int> homework;
-    int exam;
-    double finalGrade;
+struct Student {
+    int id;
+    std::string name;
+    double grade;
+    std::vector<double> homework;
+    double exam;
 
-public:
-    Student();
-    Student(const std::string &fn, const std::string &ln);
-    Student(const Student &other);
-    Student& operator=(const Student &other);
-    ~Student();
+    Student() : id(0), name(""), grade(0), exam(0) {}
+    Student(int _id, const std::string &_name) : id(_id), name(_name), grade(0), exam(0) {}
 
-    void calculateFinalGrade();
-    double getFinalGrade() const;
+    void setHomework(const std::vector<double> &hw) { homework = hw; }
+    void setExam(double ex) { exam = ex; }
 
-    const std::string& getFirstName() const;
-    const std::string& getLastName() const;
+    void calculateFinalGrade() {
+        double hwAvg = 0;
+        if (!homework.empty()) {
+            double sum = 0;
+            for (double h : homework) sum += h;
+            hwAvg = sum / homework.size();
+        }
+        grade = 0.4 * hwAvg + 0.6 * exam;
+    }
 
-    void setHomework(const std::vector<int> &hw);
-    void setExam(int ex);
+    int getId() const { return id; }
+    std::string getName() const { return name; }
+    double getGrade() const { return grade; }
 };
 
-#endif
+#endif // STUDENT_H
