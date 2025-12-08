@@ -23,23 +23,11 @@ int main() {
     students[2].setExam(82);
     students[2].calculateFinalGrade();
 
-    try {
-        FileWriter::write("students.csv", students);
-        std::cout << "File written successfully.\n";
-    } catch (const std::exception &e) {
-        std::cerr << e.what() << "\n";
-    }
+    FileWriter::write("students.csv", students);
 
-    std::vector<Student> readStudents;
-    try {
-        FileReader::readFile("students.csv", readStudents);
-        std::cout << "Read " << readStudents.size() << " students:\n";
-        for (const auto &s : readStudents) {
-            std::cout << s.getId() << " | " << s.getName()
-                      << " | Grade: " << s.getGrade() << "\n";
-        }
-    } catch (const std::exception &e) {
-        std::cerr << e.what() << "\n";
+    std::cout << "ID | Name | Final Grade\n";
+    for (const auto &s : students) {
+        std::cout << s.getId() << " | " << s.getName() << " | " << s.getFinalGrade() << "\n";
     }
 
     return 0;
