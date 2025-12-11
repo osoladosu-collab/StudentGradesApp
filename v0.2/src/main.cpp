@@ -18,6 +18,7 @@ int main() {
         int choice;
         std::cin >> choice;
 
+        // ------------------- OPTION 1: GENERATE FILES -------------------
         if (choice == 1) {
             std::cout << "Generating files (10k, 100k, 1M, 10M)...\n";
 
@@ -30,6 +31,7 @@ int main() {
             return 0;
         }
 
+        // ------------------- OPTION 2: PROCESS FILE -------------------
         std::string filename;
         std::cout << "Enter filename: ";
         std::cin >> filename;
@@ -40,7 +42,9 @@ int main() {
         // ------------------- READ -------------------
         Timer t;
         t.reset();
+
         auto students = FileReader::readFile(filename);
+
         double read_time = t.elapsed();
         std::cout << "Read " << students.size() << " students in "
                   << read_time << " s\n";
@@ -48,45 +52,50 @@ int main() {
         // ------------------- SORT -------------------
         t.reset();
         std::sort(students.begin(), students.end(),
-            [](const Student &a, const Student &b) {
+            [](const Student& a, const Student& b) {
                 return a.getFirstName() < b.getFirstName();
             }
         );
         double sort_time = t.elapsed();
         std::cout << "Sorted in " << sort_time << " s\n";
 
-        // ------------------- SPLIT -------------------
+        // ------------------- SPLIT (passed / failed) -------------------
         t.reset();
+
         std::vector<Student> passed;
         std::vector<Student> failed;
+
         passed.reserve(students.size() / 2);
         failed.reserve(students.size() / 2);
 
-        for (auto &s : students) {
+        for (auto& s : students) {
             if (s.getFinalGrade() >= 5.0)
                 passed.push_back(std::move(s));
             else
                 failed.push_back(std::move(s));
         }
+
         double split_time = t.elapsed();
         std::cout << "Split in " << split_time << " s\n";
 
-        // ------------------- WRITE -------------------
+        // ------------------- WRITE OUTPUT FILES -------------------
         t.reset();
+
         FileWriter::writeStudents("passed_" + filename, passed);
         FileWriter::writeStudents("failed_" + filename, failed);
+
         double write_time = t.elapsed();
         std::cout << "Wrote output files in " << write_time << " s\n";
 
         double total_time = total.elapsed();
         std::cout << "TOTAL TIME: " << total_time << " s\n";
 
-        // ------------------- LOG TO CSV -------------------
+        // ------------------- LOG TIMES TO CSV -------------------
         std::ofstream csv("results/timings.csv", std::ios::app);
         if (csv) {
             csv << filename << ","
                 << students.size() << ","
-                << "vector,"      // container type for v0.2
+                << "vector,"            // v0.2 uses std::vector
                 << read_time << ","
                 << sort_time << ","
                 << split_time << ","
@@ -95,23 +104,25 @@ int main() {
                 << "\n";
         }
     }
-    catch (const FileOpenError &e) {
+
+    // ------------------- EXCEPTION HANDLING -------------------
+    catch (const FileOpenError& e) {
         std::cerr << "File error: " << e.what() << '\n';
         return 2;
     }
-    catch (const ParseError &e) {
+    catch (const ParseError& e) {
         std::cerr << "Parse error: " << e.what() << '\n';
         return 3;
     }
-    catch (const GenerationError &e) {
+    catch (const GenerationError& e) {
         std::cerr << "Generation error: " << e.what() << '\n';
         return 4;
     }
-    catch (const std::bad_alloc &e) {
+    catch (const std::bad_alloc& e) {
         std::cerr << "Memory allocation failed: " << e.what() << '\n';
         return 5;
     }
-    catch (const std::exception &e) {
+    catch (const std::exception& e) {
         std::cerr << "Unexpected error: " << e.what() << '\n';
         return 99;
     }
