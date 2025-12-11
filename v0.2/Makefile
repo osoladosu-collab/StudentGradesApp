@@ -1,6 +1,8 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -O2 -Wall -Iinclude
 
+VPATH = src
+
 SRC = src/main.cpp \
       src/Student.cpp \
       src/FileReader.cpp \
