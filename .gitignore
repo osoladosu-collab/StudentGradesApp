@@ -34,3 +34,8 @@ Thumbs.db
 studentGrades
 StudentGrades
 StudentGradesApp
+*.o
+studentGrades_v02
+studentGrades_v025
+studentGrades
+*.exe
