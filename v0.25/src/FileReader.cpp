@@ -1,27 +1,50 @@
 #include "FileReader.h"
+#include "Exceptions.h"
 #include <fstream>
 #include <sstream>
-#include <iostream>
 
-void FileReader::readFile(const std::string &filename, std::vector<Student> &students) {
-    std::ifstream file(filename);
-    if (!file.is_open()) {
-        std::cerr << "Failed to open file: " << filename << std::endl;
-        return;
-    }
+std::vector<Student> FileReader::readStudents(const std::string &filename) {
+    std::ifstream in(filename);
+    if (!in) throw FileOpenError("Cannot open input file: " + filename);
+
+    std::vector<Student> students;
+    students.reserve(10000);
 
     std::string line;
-    while (std::getline(file, line)) {
-        std::stringstream ss(line);
-        int id;
-        std::string name;
-        int grade;
+    bool first = true;
 
-        if (!(ss >> id >> name >> grade)) continue; // skip invalid lines
-        students.push_back(Student(id, name));      // id first, then name
-        students.back().setExam(grade);
-        students.back().calculateFinalGrade();
+    while (std::getline(in, line)) {
+        if (line.empty()) continue;
+
+        if (first) {
+            first = false;
+            if (line.find("Name") != std::string::npos ||
+                line.find("Surname") != std::string::npos)
+                continue;
+        }
+
+        std::istringstream iss(line);
+        std::string fn, ln;
+        std::vector<int> grades;
+        int g;
+
+        if (!(iss >> fn >> ln))
+            throw ParseError("Invalid name fields: " + line);
+
+        while (iss >> g) grades.push_back(g);
+        if (grades.size() < 2)
+            throw ParseError("Less than 2 numeric grades: " + line);
+
+        int exam = grades.back();
+        grades.pop_back();
+
+        Student s(fn, ln);
+        for (int hw : grades) s.addHomework(hw);
+        s.setExam(exam);
+        s.calculateFinalGrade();
+
+        students.push_back(std::move(s));
     }
 
-    file.close();
+    return students;
 }

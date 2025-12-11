@@ -1,16 +1,15 @@
-#pragma once
+#ifndef TIMER_H
+#define TIMER_H
+
 #include <chrono>
 
 class Timer {
-    using clock = std::chrono::high_resolution_clock;
-    std::chrono::time_point<clock> start_time;
+private:
+    std::chrono::high_resolution_clock::time_point startTime;
 
 public:
-    void start() { start_time = clock::now(); }
-
-    double elapsedSeconds() const {
-        auto end_time = clock::now();
-        std::chrono::duration<double> diff = end_time - start_time;
-        return diff.count();
-    }
+    void start();
+    double stop(); // returns ms
 };
+
+#endif

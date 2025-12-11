@@ -1,38 +1,48 @@
 #include "FileReader.h"
+#include "Exceptions.h"
 #include <fstream>
 #include <sstream>
-#include <stdexcept>
 
-std::vector<Student> FileReader::readFile(const std::string &filename) {
+std::vector<Student> FileReader::readFile(const std::string& filename) {
     std::ifstream file(filename);
-    if (!file)
-        throw std::runtime_error("ERROR: Cannot open file " + filename);
+    if (!file) throw FileOpenError("Cannot open file: " + filename);
 
     std::vector<Student> students;
+    students.reserve(1000);
+
     std::string line;
-    students.reserve(1000); // optimization, increased later in main
+    std::size_t lineno = 0;
 
     while (std::getline(file, line)) {
-        std::stringstream ss(line);
-        std::string fn, ln;
-        int value;
+        ++lineno;
+        if (line.empty()) continue;
 
-        if (!(ss >> fn >> ln)) continue;
+        std::istringstream ss(line);
+        std::string fn, ln;
+        if (!(ss >> fn >> ln)) {
+            // Header or malformed line — skip
+            continue;
+        }
 
         std::vector<int> hw;
-        while (ss >> value) hw.push_back(value);
+        int val;
+        while (ss >> val) hw.push_back(val);
 
-        if (hw.size() < 2) continue; // <--- FIX
+        if (hw.empty()) {
+            throw ParseError("No grade data on line " + std::to_string(lineno) +
+                             " in file " + filename);
+        }
 
         int exam = hw.back();
         hw.pop_back();
 
         Student st(fn, ln);
-        st.setHomework(hw);
-        st.setExam(exam);
-        st.calculateFinalGrade();
 
-        students.push_back(st);
+        for (int h : hw) st.addHomework(h);
+        st.setExam(exam);
+        st.computeFinal();
+
+        students.push_back(std::move(st));
     }
 
     return students;

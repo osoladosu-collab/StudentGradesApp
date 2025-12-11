@@ -1,25 +1,52 @@
-CXX = g++
-CXXFLAGS = -std=c++17 -O2 -Wall -Iinclude
+# ==========================
+#     StudentGrades v0.2
+# ==========================
 
-VPATH = src
+CXX       := g++
+CXXFLAGS  := -std=c++17 -O2 -Wall -Wextra -Iinclude
+LDFLAGS   := 
+TARGET    := studentGrades_v02
 
-SRC = src/main.cpp \
-      src/Student.cpp \
-      src/FileReader.cpp \
-      src/FileWriter.cpp \
-      src/FileGenerator.cpp \
-      src/Timer.cpp
+SRC_DIR   := src
+INC_DIR   := include
+OBJ_DIR   := obj
 
-OBJ = $(SRC:.cpp=.o)
-OUT = studentGrades_v02
+# All .cpp files inside src/
+SRCS := $(wildcard $(SRC_DIR)/*.cpp)
 
-all: $(OUT)
+# Convert src/*.cpp → obj/*.o
+OBJS := $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
-$(OUT): $(OBJ)
-	$(CXX) $(CXXFLAGS) -o $(OUT) $(OBJ)
+# Dependency files
+DEPS := $(OBJS:.o=.d)
 
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+# Default build
+all: $(TARGET)
 
+# Link
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+# Compile rule with dependency generation
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
+
+# Ensure obj directory exists
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+# Clean everything
 clean:
-	rm -f $(OBJ) $(OUT)
+	rm -rf $(OBJ_DIR) $(TARGET)
+
+# Rebuild everything
+rebuild: clean all
+
+# Run (for quick manual tests)
+run: all
+	./$(TARGET)
+
+# Include dependency files
+-include $(DEPS)
+
+.PHONY: all clean rebuild run

@@ -1,53 +1,61 @@
 #include "Student.h"
 #include <numeric>
-#include <algorithm>
+
+// -------------------- Constructors --------------------
 
 Student::Student() : exam(0), finalGrade(0.0) {}
 
 Student::Student(const std::string &fn, const std::string &ln)
     : firstName(fn), lastName(ln), exam(0), finalGrade(0.0) {}
 
-// Copy constructor
-Student::Student(const Student &other)
-    : firstName(other.firstName),
-      lastName(other.lastName),
-      homework(other.homework),
-      exam(other.exam),
-      finalGrade(other.finalGrade) {}
+Student::Student(const Student &other) = default;
 
-// Move constructor (NEW)
 Student::Student(Student&& other) noexcept = default;
 
-// Copy assignment
-Student& Student::operator=(const Student &other) {
-    if (this != &other) {
-        firstName = other.firstName;
-        lastName = other.lastName;
-        homework = other.homework;
-        exam = other.exam;
-        finalGrade = other.finalGrade;
-    }
-    return *this;
-}
+// -------------------- Assignment operators --------------------
 
-// Move assignment (NEW)
+Student& Student::operator=(const Student &other) = default;
+
 Student& Student::operator=(Student&& other) noexcept = default;
 
-Student::~Student() {}
+// -------------------- Mutators --------------------
 
-void Student::calculateFinalGrade() {
-    if (homework.empty()) {
-        finalGrade = 0.6 * exam;
-        return;
-    }
-    double sum = std::accumulate(homework.begin(), homework.end(), 0);
-    double avg = sum / homework.size();
-    finalGrade = 0.4 * avg + 0.6 * exam;
+void Student::addHomework(int grade) {
+    homework.push_back(grade);
 }
 
-double Student::getFinalGrade() const { return finalGrade; }
-const std::string& Student::getFirstName() const { return firstName; }
-const std::string& Student::getLastName() const { return lastName; }
+void Student::setExam(int grade) {
+    exam = grade;
+}
 
-void Student::setHomework(const std::vector<int> &hw) { homework = hw; }
-void Student::setExam(int ex) { exam = ex; }
+void Student::computeFinal() {
+    if (!homework.empty()) {
+        double avg = std::accumulate(homework.begin(), homework.end(), 0.0)
+                     / homework.size();
+        finalGrade = 0.4 * avg + 0.6 * exam;
+    } else {
+        finalGrade = 0.6 * exam;
+    }
+}
+
+// -------------------- Accessors --------------------
+
+const std::string& Student::getFirstName() const {
+    return firstName;
+}
+
+const std::string& Student::getLastName() const {
+    return lastName;
+}
+
+const std::vector<int>& Student::getHomework() const {
+    return homework;
+}
+
+int Student::getExam() const {
+    return exam;
+}
+
+double Student::getFinalGrade() const {
+    return finalGrade;
+}

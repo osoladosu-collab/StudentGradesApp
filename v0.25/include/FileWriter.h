@@ -1,9 +1,14 @@
-#pragma once
+#ifndef FILEWRITER_H
+#define FILEWRITER_H
+
 #include <string>
 #include <vector>
 #include "Student.h"
 
 class FileWriter {
 public:
-    static void write(const std::string &filename, const std::vector<Student> &students);
+    static void writeStudents(const std::string &filename,
+                              const std::vector<Student> &students);
 };
+
+#endif

@@ -1,29 +1,32 @@
 #include "FileGenerator.h"
-#include "FileWriter.h"
 #include <random>
-#include <numeric> // for std::accumulate
+#include <fstream>
 
-void FileGenerator::generate(const std::string &filename, std::vector<Student> &students) {
+void FileGenerator::generate(const std::string &filename,
+                             std::vector<Student> &output) {
+    std::ofstream out(filename);
+    if (!out) throw std::runtime_error("Cannot write to file: " + filename);
+
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> hwDist(60.0, 100.0);   // Homework grades
-    std::uniform_real_distribution<> examDist(60.0, 100.0); // Exam grades
+    std::uniform_int_distribution<> gradeDist(1, 10);
 
-    for (auto &student : students) {
-        // Generate 5 random homework grades
-        student.homework.resize(5);
-        for (auto &h : student.homework) {
-            h = hwDist(gen);
-        }
+    for (size_t i = 0; i < output.capacity(); i++) {
+        Student s("Name" + std::to_string(i),
+                  "Surname" + std::to_string(i));
 
-        // Generate exam grade
-        student.exam = examDist(gen);
+        for (int j = 0; j < 5; j++)
+            s.addHomework(gradeDist(gen));
 
-        // Calculate final grade (e.g., 40% homework average + 60% exam)
-        double hwAverage = std::accumulate(student.homework.begin(), student.homework.end(), 0.0) / student.homework.size();
-        student.finalGrade = hwAverage * 0.4 + student.exam * 0.6;
+        s.setExam(gradeDist(gen));
+        s.calculateFinalGrade();
+
+        output.push_back(s);
+
+        out << s.getFirstName() << " "
+            << s.getLastName() << " ";
+
+        for (int h : s.getHomework()) out << h << " ";
+        out << s.getExam() << "\n";
     }
-
-    // Write to file using FileWriter
-    FileWriter::write(filename, students);
 }

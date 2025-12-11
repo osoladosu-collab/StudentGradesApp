@@ -13,22 +13,29 @@ private:
     double finalGrade;
 
 public:
+    // Constructors
     Student();
     Student(const std::string &fn, const std::string &ln);
 
-    // Rule of Three
+    // Copy operations
     Student(const Student &other);
     Student& operator=(const Student &other);
-    ~Student();
 
-    void calculateFinalGrade();                   // average method
-    double getFinalGrade() const;
+    // Move operations
+    Student(Student&& other) noexcept;
+    Student& operator=(Student&& other) noexcept;
 
+    // Setters
+    void addHomework(int grade);
+    void setExam(int grade);
+    void computeFinal();
+
+    // Getters
     const std::string& getFirstName() const;
     const std::string& getLastName() const;
-
-    void setHomework(const std::vector<int> &hw);
-    void setExam(int ex);
+    const std::vector<int>& getHomework() const;
+    int getExam() const;
+    double getFinalGrade() const;
 };
 
 #endif
