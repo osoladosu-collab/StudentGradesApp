@@ -7,8 +7,8 @@
 
 class FileReader {
 public:
-    // returns vector of students read from a file (each line: Name Surname hw1 ... hwN exam)
+    // Reads Name Surname HW... Exam
     static std::vector<Student> readStudents(const std::string &filename);
 };
 
-#endif // FILEREADER_H
+#endif

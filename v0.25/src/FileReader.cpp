@@ -1,41 +1,49 @@
 #include "FileReader.h"
-#include "Exceptions.h"
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 
 std::vector<Student> FileReader::readStudents(const std::string &filename) {
     std::ifstream in(filename);
-    if (!in) throw FileOpenError("Cannot open file: " + filename);
+    if (!in) {
+        throw std::runtime_error("Failed to open file: " + filename);
+    }
 
-    std::vector<Student> out;
-    out.reserve(1024);
-
+    std::vector<Student> students;
     std::string line;
-    std::size_t lineNo = 0;
+
     while (std::getline(in, line)) {
-        ++lineNo;
-        if (line.empty()) continue;
-        std::istringstream ss(line);
+        std::stringstream ss(line);
+
         std::string fn, ln;
-        if (!(ss >> fn >> ln)) {
-            // skip lines that don't have at least two tokens
+        ss >> fn >> ln;
+
+        if (fn.empty() || ln.empty())
             continue;
-        }
-
-        std::vector<int> hw;
-        int value;
-        while (ss >> value) hw.push_back(value);
-
-        if (hw.empty()) {
-            throw ParseError("No grades on line " + std::to_string(lineNo) + " in " + filename);
-        }
-        int exam = hw.back(); hw.pop_back();
 
         Student s(fn, ln);
-        s.setHomework(hw);
+
+        int x;
+        std::vector<int> homework;
+
+        while (ss >> x) {
+            homework.push_back(x);
+        }
+
+        if (homework.empty())
+            continue;
+
+        int exam = homework.back();
+        homework.pop_back();
+
+        for (int hw : homework)
+            s.addHomework(hw);
+
         s.setExam(exam);
-        // don't calculate final yet (main will choose avg/med)
-        out.push_back(std::move(s));
+        s.calculateFinal(true);
+
+        students.push_back(s);
     }
-    return out;
+
+    return students;
 }

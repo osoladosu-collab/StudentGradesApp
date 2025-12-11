@@ -20,17 +20,19 @@ public:
     Student(const std::string &fn, const std::string &ln)
         : firstName(fn), lastName(ln) {}
 
-    // Getters expected by main.cpp
+    // ------------- Getters -------------
     const std::string& getName() const { return firstName; }
     const std::string& getSurname() const { return lastName; }
     double getFinalGrade() const { return finalGrade; }
 
+    // ------------- Input helpers -------------
     void addHomework(int x) { homework.push_back(x); }
     void setExam(int e) { exam = e; }
 
+    // ------------- Grade calculation -------------
     void calculateFinal(bool useAverage = true) {
         if (homework.empty()) {
-            finalGrade = exam * 0.6;
+            finalGrade = 0.6 * exam;
             return;
         }
 
@@ -38,7 +40,7 @@ public:
 
         if (useAverage) {
             hwScore = std::accumulate(homework.begin(), homework.end(), 0.0)
-                      / homework.size();
+                    / homework.size();
         } else {
             std::vector<int> temp = homework;
             std::sort(temp.begin(), temp.end());
@@ -48,7 +50,7 @@ public:
                 hwScore = temp[temp.size()/2];
         }
 
-        finalGrade = hwScore * 0.4 + exam * 0.6;
+        finalGrade = 0.4 * hwScore + 0.6 * exam;
     }
 };
 

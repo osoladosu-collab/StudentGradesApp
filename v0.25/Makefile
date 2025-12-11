@@ -1,15 +1,19 @@
-TARGET = studentGrades_v025
-SRC = src/main.cpp
-OBJ = obj/main.o
 CXX = g++
 CXXFLAGS = -std=c++17 -O2 -Wall -Iinclude
 
-$(TARGET): $(OBJ)
-	$(CXX) $(OBJ) -o $(TARGET)
+SRC = $(wildcard src/*.cpp)
+OBJ = $(patsubst src/%.cpp,obj/%.o,$(SRC))
 
-obj/main.o: src/main.cpp
-	mkdir -p obj
-	$(CXX) $(CXXFLAGS) -c src/main.cpp -o obj/main.o
+TARGET = studentGrades_v025
+
+all: $(TARGET)
+
+$(TARGET): $(OBJ)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+obj/%.o: src/%.cpp
+	@mkdir -p obj
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
 	rm -rf obj $(TARGET)

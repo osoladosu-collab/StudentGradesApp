@@ -1,27 +1,26 @@
 #include "CSVWriter.h"
-#include <fstream>
 
-CSVWriter::CSVWriter(const std::string &filename)
-    : filename(filename) {}
+CSVWriter::CSVWriter(const std::string &filename) {
+    file.open(filename);
+}
+
+CSVWriter::~CSVWriter() {
+    if (file.is_open())
+        file.close();
+}
 
 void CSVWriter::writeHeader(const std::vector<std::string> &header) {
-    if (headerWritten) return;
-
-    std::ofstream out(filename, std::ios::app);
-    for (size_t i = 0; i < header.size(); ++i) {
-        out << header[i];
-        if (i + 1 < header.size()) out << ",";
+    for (size_t i = 0; i < header.size(); i++) {
+        file << header[i];
+        if (i + 1 < header.size()) file << ",";
     }
-    out << "\n";
-
-    headerWritten = true;
+    file << "\n";
 }
 
 void CSVWriter::appendRow(const std::vector<std::string> &row) {
-    std::ofstream out(filename, std::ios::app);
-    for (size_t i = 0; i < row.size(); ++i) {
-        out << row[i];
-        if (i + 1 < row.size()) out << ",";
+    for (size_t i = 0; i < row.size(); i++) {
+        file << row[i];
+        if (i + 1 < row.size()) file << ",";
     }
-    out << "\n";
+    file << "\n";
 }

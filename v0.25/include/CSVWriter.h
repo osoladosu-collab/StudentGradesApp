@@ -1,26 +1,20 @@
 #ifndef CSVWRITER_H
 #define CSVWRITER_H
 
-#include <fstream>
 #include <string>
+#include <vector>
+#include <fstream>
 
 class CSVWriter {
 public:
-    template <typename Container>
-    static void write(const std::string& filename, const Container& students) {
-        std::ofstream out(filename);
-        if (!out) {
-            throw std::runtime_error("Failed to write: " + filename);
-        }
+    explicit CSVWriter(const std::string &filename);
+    ~CSVWriter();
 
-        out << "FirstName,LastName,FinalGrade\n";
+    void writeHeader(const std::vector<std::string> &header);
+    void appendRow(const std::vector<std::string> &row);
 
-        for (const auto& s : students) {
-            out << s.getName() << ","
-                << s.getSurname() << ","
-                << s.getFinalGrade() << "\n";
-        }
-    }
+private:
+    std::ofstream file;
 };
 
 #endif
