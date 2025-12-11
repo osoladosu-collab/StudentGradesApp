@@ -11,46 +11,36 @@ private:
     std::string lastName;
     std::vector<int> homework;
     int exam;
-    // no need to store a single finalGrade; we'll compute avg/median on demand
+    double finalAverage;
+    double finalMedian;
+
+    void computeFinals();
 
 public:
-    // static: number of homework columns expected when reading from structured files
+    // Used when reading from files
     static int fileHomeworkCount;
-    // Constructors
+
     Person();
-    Person(const std::string &fn, const std::string &ln);
+    Person(const std::string &fn, const std::string &ln,
+           const std::vector<int> &hw, int ex);
 
-    // Rule of three
-    Person(const Person &other);
-    Person& operator=(const Person &other);
-    ~Person();
+    // Getters
+    const std::string& getFirstName() const { return firstName; }
+    const std::string& getLastName() const { return lastName; }
+    const std::vector<int>& getHomework() const { return homework; }
+    int getExam() const { return exam; }
+    double getFinalAverage() const { return finalAverage; }
+    double getFinalMedian() const { return finalMedian; }
 
-    // Read/write helpers (also used by operator>> / operator<<)
-    void readFromConsole();                 // manual console input (hw until -1)
-    static Person randomPerson(int hwCount); // create random person with hwCount homeworks
+    // User input
+    void readFromConsole();
 
-    // Calculations
-    double homeworkAverage() const;
-    double homeworkMedian() const;
-    double finalByAverage() const; // 40% hw avg + 60% exam
-    double finalByMedian() const;  // 40% hw median + 60% exam
+    // Random person generator
+    static Person randomPerson(int hwCount);
 
-    // Accessors
-    const std::string& getFirstName() const;
-    const std::string& getLastName() const;
-    const std::vector<int>& getHomework() const;
-    int getExam() const;
-
-    // For file parsing: read exactly fileHomeworkCount homework values and exam from a stream
+    // Stream operators
     friend std::istream& operator>>(std::istream &is, Person &p);
     friend std::ostream& operator<<(std::ostream &os, const Person &p);
-
-    // utility to set data directly (used by file parser)
-    void setData(const std::string &fn, const std::string &ln,
-                 const std::vector<int> &hw, int ex);
-
-    // clear homework (helpful for reuse)
-    void clearHomework();
 };
 
-#endif // PERSON_H
+#endif
