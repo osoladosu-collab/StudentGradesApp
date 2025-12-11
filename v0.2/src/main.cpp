@@ -31,6 +31,56 @@ int main() {
     std::cout << "Enter filename: ";
     std::cin >> filename;
 
+    Timer totalTimer;
+    totalTimer.reset();
+
+    Timer timer;
+    timer.reset();
+
+    std::vector<Student> students;
+
+    try {
+        students = FileReader::readFile(filename);
+    } catch (const std::exception &e) {
+        std::cout << e.what() << "\n";
+        return 1;
+    }
+
+    std::cout << "Loaded " << students.size() << " students in "
+              << timer.elapsed() << " sec\n";
+
+    timer.reset();
+    std::sort(students.begin(), students.end(),
+              [](const Student &a, const Student &b) {
+                  return a.getFinalGrade() < b.getFinalGrade();
+              });
+
+    std::cout << "Sorted in " << timer.elapsed() << " sec\n";
+
+    std::vector<Student> passed, failed;
+
+    timer.reset();
+    for (const auto &s : students) {
+        if (s.getFinalGrade() < 5.0)
+            failed.push_back(s);
+        else
+            passed.push_back(s);
+    }
+    std::cout << "Split into passed/failed in " << timer.elapsed() << " sec\n";
+
+    timer.reset();
+    FileWriter::writeStudents("failed.txt", failed);
+    FileWriter::writeStudents("passed.txt", passed);
+    std::cout << "Wrote output in " << timer.elapsed() << " sec\n";
+
+    std::cout << "TOTAL program time: " << totalTimer.elapsed() << " sec\n";
+
+    return 0;
+}
+
+    std::cout << "Enter filename: ";
+    std::cin >> filename;
+
     Timer timer;
     timer.reset();
 
