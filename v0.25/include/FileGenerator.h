@@ -2,13 +2,12 @@
 #define FILEGENERATOR_H
 
 #include <string>
-#include <vector>
-#include "Student.h"
 
 class FileGenerator {
 public:
-    static void generate(const std::string &filename,
-                         std::vector<Student> &output);
+    // generate a single file with 'count' records
+    // each record: NameX SurnameX hw1 hw2 hw3 hw4 hw5 exam
+    static void generateFile(const std::string &filename, long count);
 };
 
-#endif
+#endif // FILEGENERATOR_H

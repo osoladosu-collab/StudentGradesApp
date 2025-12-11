@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+#include <numeric>
+#include <algorithm>
 
 class Student {
 private:
@@ -13,28 +15,43 @@ private:
     double finalGrade;
 
 public:
-    Student();
-    Student(const std::string &fn, const std::string &ln);
+    Student() : exam(0), finalGrade(0.0) {}
+    Student(const std::string& fn, const std::string& ln)
+        : firstName(fn), lastName(ln), exam(0), finalGrade(0.0) {}
 
-    // Rule of 5 (default OK — vector handles its own memory)
-    Student(const Student &) = default;
-    Student(Student &&) noexcept = default;
-    Student &operator=(const Student &) = default;
-    Student &operator=(Student &&) noexcept = default;
-
-    // Homework & exam input
-    void addHomework(int grade);
-    void setExam(int examGrade);
-
-    // Final grade calculation
-    void calculateFinalGrade();
-
-    // Getters
-    const std::string &getFirstName() const { return firstName; }
-    const std::string &getLastName() const { return lastName; }
-    const std::vector<int> &getHomework() const { return homework; }
-    int getExam() const { return exam; }
+    // getters
+    const std::string& getFirstName() const { return firstName; }
+    const std::string& getLastName() const { return lastName; }
     double getFinalGrade() const { return finalGrade; }
+
+    void setHomework(const std::vector<int>& hw) { homework = hw; }
+    void addHomework(int x) { homework.push_back(x); }
+    void setExam(int e) { exam = e; }
+
+    void calculateFinalGrade(bool averageMethod = true) {
+        if (homework.empty()) {
+            finalGrade = exam * 0.6;
+            return;
+        }
+
+        double hwComponent = 0.0;
+
+        if (averageMethod) {
+            hwComponent = std::accumulate(homework.begin(),
+                                          homework.end(), 0.0) / homework.size();
+        } else {
+            std::vector<int> sorted = homework;
+            std::sort(sorted.begin(), sorted.end());
+            if (sorted.size() % 2 == 0)
+                hwComponent = (sorted[sorted.size()/2 - 1] + sorted[sorted.size()/2]) / 2.0;
+            else
+                hwComponent = sorted[sorted.size()/2];
+        }
+
+        finalGrade = hwComponent * 0.4 + exam * 0.6;
+    }
+
+    std::string fullName() const { return firstName + " " + lastName; }
 };
 
 #endif

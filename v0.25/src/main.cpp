@@ -1,111 +1,111 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <vector>
-#include <string>
+#include <list>
+#include <deque>
+#include <algorithm>
+
 #include "Student.h"
-#include "FileReader.h"
-#include "FileWriter.h"
-#include "FileGenerator.h"
 #include "Timer.h"
-#include "Exceptions.h"
+#include "CSVWriter.h"
 
-int main() {
-    try {
-        std::cout << "STUDENT GRADES APP v0.25\n";
-        std::cout << "-----------------------------\n";
+template <typename Container>
+void processWithContainer(const std::string &filename, bool useAverage)
+{
+    Container students;
 
-        std::cout << "Choose mode:\n"
-                  << "1 - Manual input\n"
-                  << "2 - Read from file\n"
-                  << "3 - Generate file\n"
-                  << "Choice: ";
+    {
+        Timer t("Reading file");
+        std::ifstream file(filename);
+        if (!file) {
+            std::cerr << "Cannot open file: " << filename << "\n";
+            return;
+        }
 
-        int mode;
-        std::cin >> mode;
+        std::string line;
+        while (std::getline(file, line)) {
+            std::stringstream ss(line);
+            std::string fn, ln;
+            ss >> fn >> ln;
 
-        if (mode == 1) {
-            int count;
-            std::cout << "How many students? ";
-            std::cin >> count;
+            Student s(fn, ln);
 
-            std::vector<Student> students;
-            students.reserve(count);
-
-            for (int i = 0; i < count; i++) {
-                std::string fn, ln;
-                int hwCount, exam, g;
-
-                std::cout << "\nStudent " << (i + 1) << ":\n";
-                std::cout << "First name: ";
-                std::cin >> fn;
-                std::cout << "Last name: ";
-                std::cin >> ln;
-                std::cout << "Number of HW grades: ";
-                std::cin >> hwCount;
-
-                Student s(fn, ln);
-                for (int j = 0; j < hwCount; j++) {
-                    std::cout << "HW" << (j + 1) << ": ";
-                    std::cin >> g;
-                    s.addHomework(g);
-                }
-
-                std::cout << "Exam grade: ";
-                std::cin >> exam;
-
-                s.setExam(exam);
-                s.calculateFinalGrade();
-                students.push_back(s);
+            int hw;
+            for (int i = 0; i < 5; i++) {
+                ss >> hw;
+                s.addHomework(hw);
             }
 
-            FileWriter::writeStudents("manual_output.txt", students);
-            std::cout << "Saved to manual_output.txt\n";
-        }
+            int exam;
+            ss >> exam;
+            s.setExam(exam);
 
-        else if (mode == 2) {
-            std::string filename;
-            std::cout << "Filename: ";
-            std::cin >> filename;
-
-            Timer t;
-            t.start();
-            auto students = FileReader::readStudents(filename);
-            double ms = t.stop();
-
-            std::cout << "Loaded " << students.size() << " students in "
-                      << ms << " ms\n";
-
-            FileWriter::writeStudents("output_sorted.txt", students);
-            std::cout << "Saved to output_sorted.txt\n";
-        }
-
-        else if (mode == 3) {
-            std::string filename;
-            int count;
-
-            std::cout << "Output filename: ";
-            std::cin >> filename;
-
-            std::cout << "How many records? ";
-            std::cin >> count;
-
-            std::vector<Student> students;
-            students.reserve(count);
-
-            Timer t;
-            t.start();
-            FileGenerator::generate(filename, students);
-            double ms = t.stop();
-
-            std::cout << "Generated file in " << ms << " ms\n";
-        }
-
-        else {
-            std::cout << "Invalid selection.\n";
+            students.push_back(s);
         }
     }
-    catch (std::exception &e) {
-        std::cerr << "ERROR: " << e.what() << "\n";
+
+    {
+        Timer t("Calculating final grades");
+        for (auto &s : students)
+            s.calculateFinalGrade(useAverage);
     }
+
+    Container weak, strong;
+
+    {
+        Timer t("Splitting students");
+        for (auto &s : students) {
+            if (s.getFinalGrade() < 5.0)
+                weak.push_back(s);
+            else
+                strong.push_back(s);
+        }
+    }
+
+    {
+        Timer t("Sorting students");
+
+        if constexpr (std::is_same_v<Container, std::list<Student>>) {
+            weak.sort([](const Student &a, const Student &b) {
+                return a.getFinalGrade() < b.getFinalGrade();
+            });
+            strong.sort([](const Student &a, const Student &b) {
+                return a.getFinalGrade() < b.getFinalGrade();
+            });
+        } else {
+            std::sort(weak.begin(), weak.end(), [](const Student &a, const Student &b) {
+                return a.getFinalGrade() < b.getFinalGrade();
+            });
+            std::sort(strong.begin(), strong.end(), [](const Student &a, const Student &b) {
+                return a.getFinalGrade() < b.getFinalGrade();
+            });
+        }
+    }
+
+    {
+        Timer t("Writing output files");
+        CSVWriter w("weak.csv");
+        CSVWriter s("strong.csv");
+
+        for (auto &st : weak)
+            w.writeRow({st.getFirstName(), st.getLastName(), std::to_string(st.getFinalGrade())});
+
+        for (auto &st : strong)
+            s.writeRow({st.getFirstName(), st.getLastName(), std::to_string(st.getFinalGrade())});
+    }
+}
+
+int main()
+{
+    std::cout << "Running with std::vector...\n";
+    processWithContainer<std::vector<Student>>("students.txt", true);
+
+    std::cout << "Running with std::list...\n";
+    processWithContainer<std::list<Student>>("students.txt", true);
+
+    std::cout << "Running with std::deque...\n";
+    processWithContainer<std::deque<Student>>("students.txt", true);
 
     return 0;
 }
