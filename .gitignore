@@ -1,41 +1,17 @@
-# ----------------------------------------
-# Build and compilation outputs
-# ----------------------------------------
+# Build outputs
+**/obj/
 *.o
-*.obj
-*.exe
-*.out
-*.dll
-*.so
-*.dylib
+*.d
 
-# Visual Studio / VS Code / CLion build directories
-/build/
-cmake-build-debug/
-cmake-build-release/
-.idea/
-.vscode/
-
-# ----------------------------------------
-# Mac/Windows system junk
-# ----------------------------------------
-.DS_Store
-Thumbs.db
-
-# ----------------------------------------
-# Temporary files
-# ----------------------------------------
-*.log
-*.tmp
-
-# ----------------------------------------
-# StudentGradesApp binary (if generated)
-# ----------------------------------------
-studentGrades
-StudentGrades
-StudentGradesApp
-*.o
+# Binaries
 studentGrades_v02
 studentGrades_v025
-studentGrades
-*.exe
+
+# Generated data files
+*.txt
+passed_*
+failed_*
+results/
+
+# VSCode / Codespaces
+.vscode/
