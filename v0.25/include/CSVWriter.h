@@ -3,30 +3,24 @@
 
 #include <fstream>
 #include <string>
-#include <vector>
 
 class CSVWriter {
-private:
-    std::ofstream out;
-
 public:
-    CSVWriter(const std::string &filename) {
-        out.open(filename);
-    }
-
-    ~CSVWriter() {
-        if (out.is_open()) out.close();
-    }
-
-    void writeRow(const std::vector<std::string> &row) {
-        for (size_t i = 0; i < row.size(); i++) {
-            out << row[i];
-            if (i + 1 < row.size()) out << ",";
+    template <typename Container>
+    static void write(const std::string& filename, const Container& students) {
+        std::ofstream out(filename);
+        if (!out) {
+            throw std::runtime_error("Failed to write: " + filename);
         }
-        out << "\n";
-    }
 
-    bool isOpen() const { return out.is_open(); }
+        out << "FirstName,LastName,FinalGrade\n";
+
+        for (const auto& s : students) {
+            out << s.getName() << ","
+                << s.getSurname() << ","
+                << s.getFinalGrade() << "\n";
+        }
+    }
 };
 
 #endif
