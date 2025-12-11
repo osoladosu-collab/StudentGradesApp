@@ -1,17 +1,23 @@
 CXX = g++
-CXXFLAGS = -std=gnu++17 -O2 -Iinclude
+CXXFLAGS = -std=c++17 -O2 -Wall -Iinclude
 
-SRC = src/main.cpp src/Student.cpp src/FileReader.cpp src/FileWriter.cpp src/FileGenerator.cpp src/Timer.cpp
+SRC = src/main.cpp \
+      src/Student.cpp \
+      src/FileReader.cpp \
+      src/FileWriter.cpp \
+      src/FileGenerator.cpp \
+      src/Timer.cpp
+
 OBJ = $(SRC:.cpp=.o)
-TARGET = studentGrades_v02
+OUT = studentGrades_v02
 
-all: $(TARGET)
+all: $(OUT)
 
-$(TARGET): $(OBJ)
-	$(CXX) $(OBJ) -o $(TARGET)
+$(OUT): $(OBJ)
+	$(CXX) $(CXXFLAGS) -o $(OUT) $(OBJ)
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJ) $(TARGET)
+	rm -f $(OBJ) $(OUT)
