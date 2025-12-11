@@ -7,10 +7,18 @@ Student::Student() : exam(0), finalGrade(0.0) {}
 Student::Student(const std::string &fn, const std::string &ln)
     : firstName(fn), lastName(ln), exam(0), finalGrade(0.0) {}
 
+// Copy constructor
 Student::Student(const Student &other)
-    : firstName(other.firstName), lastName(other.lastName),
-      homework(other.homework), exam(other.exam), finalGrade(other.finalGrade) {}
+    : firstName(other.firstName),
+      lastName(other.lastName),
+      homework(other.homework),
+      exam(other.exam),
+      finalGrade(other.finalGrade) {}
 
+// Move constructor (NEW)
+Student::Student(Student&& other) noexcept = default;
+
+// Copy assignment
 Student& Student::operator=(const Student &other) {
     if (this != &other) {
         firstName = other.firstName;
@@ -21,6 +29,9 @@ Student& Student::operator=(const Student &other) {
     }
     return *this;
 }
+
+// Move assignment (NEW)
+Student& Student::operator=(Student&& other) noexcept = default;
 
 Student::~Student() {}
 
