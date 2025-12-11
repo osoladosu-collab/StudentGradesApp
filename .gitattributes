@@ -1,1 +1,17 @@
-*.txt filter=lfs diff=lfs merge=lfs -text
+# ----------------------------------------
+# Git LFS for large student data files
+# ----------------------------------------
+students*.txt filter=lfs diff=lfs merge=lfs -text
+
+# ----------------------------------------
+# Normalize line endings for code files
+# Ensures consistent behaviour across OS
+# ----------------------------------------
+*.cpp text eol=lf
+*.h   text eol=lf
+*.md  text eol=lf
+
+# ----------------------------------------
+# Treat text files normally (NOT LFS)
+# ----------------------------------------
+*.txt text
