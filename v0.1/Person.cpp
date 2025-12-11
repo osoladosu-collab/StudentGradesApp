@@ -1,142 +1,120 @@
 #include "Person.h"
 #include <algorithm>
-#include <numeric>
 #include <iomanip>
 #include <random>
+#include <sstream>
 
+// static member initialization
 int Person::fileHomeworkCount = 0;
 
-// Constructors
-Person::Person() : firstName(""), lastName(""), homework(), exam(0) {}
-Person::Person(const std::string &fn, const std::string &ln)
-    : firstName(fn), lastName(ln), homework(), exam(0) {}
+Person::Person() : exam(0), finalAverage(0), finalMedian(0) {}
 
-// Copy constructor
-Person::Person(const Person &other)
-    : firstName(other.firstName), lastName(other.lastName),
-      homework(other.homework), exam(other.exam) {}
-
-// Assignment operator
-Person& Person::operator=(const Person &other) {
-    if (this != &other) {
-        firstName = other.firstName;
-        lastName  = other.lastName;
-        homework  = other.homework;
-        exam      = other.exam;
-    }
-    return *this;
+Person::Person(const std::string &fn, const std::string &ln,
+               const std::vector<int> &hw, int ex)
+    : firstName(fn), lastName(ln), homework(hw), exam(ex) {
+    computeFinals();
 }
 
-// Destructor
-Person::~Person() {}
+void Person::computeFinals() {
+    if (homework.empty()) {
+        finalAverage = 0;
+        finalMedian = 0;
+        return;
+    }
 
-// Console input (manual): hw until -1 sentinel
+    // Average
+    double sum = 0;
+    for (int h : homework) sum += h;
+    finalAverage = 0.4 * (sum / homework.size()) + 0.6 * exam;
+
+    // Median
+    std::vector<int> sorted = homework;
+    std::sort(sorted.begin(), sorted.end());
+    double median;
+
+    if (sorted.size() % 2 == 0)
+        median = (sorted[sorted.size()/2 - 1] + sorted[sorted.size()/2]) / 2.0;
+    else
+        median = sorted[sorted.size()/2];
+
+    finalMedian = 0.4 * median + 0.6 * exam;
+}
+
 void Person::readFromConsole() {
+    homework.clear();
+
     std::cout << "Enter first name: ";
     std::cin >> firstName;
+
     std::cout << "Enter last name: ";
     std::cin >> lastName;
 
-    homework.clear();
-    std::cout << "Enter homework grades (integers 0-10). Enter -1 to finish:\n";
-    int x;
-    while (std::cin >> x && x != -1) {
-        homework.push_back(x);
+    std::cout << "Enter homework grades (enter -1 to finish): ";
+    while (true) {
+        int grade;
+        std::cin >> grade;
+        if (grade == -1) break;
+        if (grade >= 0 && grade <= 10)
+            homework.push_back(grade);
+        else
+            std::cout << "Invalid grade, enter 0–10 or -1 to finish: ";
     }
-    // clear any trailing newline state
-    if (!std::cin) return; // input failure will be handled by caller
 
-    std::cout << "Enter exam grade (integer 0-10): ";
+    std::cout << "Enter exam grade: ";
     std::cin >> exam;
+
+    computeFinals();
 }
 
-// Random person generator
 Person Person::randomPerson(int hwCount) {
-    static std::mt19937 rng((unsigned)std::random_device{}());
+    static const std::vector<std::string> fnames = {
+        "John","Mary","Alex","Sarah","Tom","Linda"
+    };
+    static const std::vector<std::string> lnames = {
+        "Smith","Johnson","Brown","Taylor","Miller","Davis"
+    };
+
+    static std::mt19937 rng(std::random_device{}());
+    std::uniform_int_distribution<int> nameDist(0, 5);
     std::uniform_int_distribution<int> gradeDist(1, 10);
-    static int counter = 1;
 
-    Person p;
-    p.firstName = "RandName" + std::to_string(counter);
-    p.lastName  = "RandSurname" + std::to_string(counter++);
-    p.homework.clear();
-    for (int i = 0; i < hwCount; ++i) p.homework.push_back(gradeDist(rng));
-    p.exam = gradeDist(rng);
-    return p;
+    std::string fn = fnames[nameDist(rng)];
+    std::string ln = lnames[nameDist(rng)];
+
+    std::vector<int> hw(hwCount);
+    for (int &h : hw) h = gradeDist(rng);
+
+    int ex = gradeDist(rng);
+
+    return Person(fn, ln, hw, ex);
 }
 
-// calculations
-double Person::homeworkAverage() const {
-    if (homework.empty()) return 0.0;
-    double sum = std::accumulate(homework.begin(), homework.end(), 0);
-    return sum / static_cast<double>(homework.size());
-}
-
-double Person::homeworkMedian() const {
-    if (homework.empty()) return 0.0;
-    std::vector<int> temp = homework;
-    std::sort(temp.begin(), temp.end());
-    size_t n = temp.size();
-    if (n % 2 == 1) return static_cast<double>(temp[n/2]);
-    return (temp[n/2 - 1] + temp[n/2]) / 2.0;
-}
-
-double Person::finalByAverage() const {
-    if (homework.empty()) return 0.6 * exam;
-    return 0.4 * homeworkAverage() + 0.6 * exam;
-}
-
-double Person::finalByMedian() const {
-    if (homework.empty()) return 0.6 * exam;
-    return 0.4 * homeworkMedian() + 0.6 * exam;
-}
-
-// Accessors
-const std::string& Person::getFirstName() const { return firstName; }
-const std::string& Person::getLastName() const  { return lastName; }
-const std::vector<int>& Person::getHomework() const { return homework; }
-int Person::getExam() const { return exam; }
-
-void Person::setData(const std::string &fn, const std::string &ln,
-                     const std::vector<int> &hw, int ex) {
-    firstName = fn;
-    lastName = ln;
-    homework = hw;
-    exam = ex;
-}
-
-void Person::clearHomework() { homework.clear(); }
-
-// operator>> assumes Person::fileHomeworkCount is set appropriately before reading
 std::istream& operator>>(std::istream &is, Person &p) {
     p.homework.clear();
-    if (!(is >> p.firstName)) return is; // failed or EOF
-    if (!(is >> p.lastName)) return is;
 
-    // Read exactly fileHomeworkCount integers for homework
+    if (!(is >> p.firstName >> p.lastName))
+        return is;
+
+    int grade;
+
+    // read exactly fileHomeworkCount HW grades
     for (int i = 0; i < Person::fileHomeworkCount; ++i) {
-        int g;
-        if (!(is >> g)) { // if unexpected EOF, set failbit and return
-            is.setstate(std::ios::failbit);
-            return is;
-        }
-        p.homework.push_back(g);
+        if (!(is >> grade)) return is;
+        p.homework.push_back(grade);
     }
 
     // read exam
-    if (!(is >> p.exam)) {
-        is.setstate(std::ios::failbit);
-        return is;
-    }
+    if (!(is >> p.exam)) return is;
 
+    p.computeFinals();
     return is;
 }
 
-// operator<< prints name, surname, final(avg) and final(med) in aligned columns
 std::ostream& operator<<(std::ostream &os, const Person &p) {
     os << std::left << std::setw(12) << p.firstName
        << std::setw(12) << p.lastName
-       << std::right << std::setw(14) << std::fixed << std::setprecision(2) << p.finalByAverage()
-       << " | " << std::setw(12) << std::fixed << std::setprecision(2) << p.finalByMedian();
+       << std::right << std::setw(14) << std::fixed << std::setprecision(2)
+       << p.finalAverage << " | "
+       << std::setw(12) << p.finalMedian;
     return os;
 }
