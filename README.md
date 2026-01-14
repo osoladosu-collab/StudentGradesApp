@@ -89,3 +89,45 @@ StudentGradesApp/
 Release v0.1
 
 Release v0.1 includes the full implementation of the application, manual and file input functionality, random grade generation, sorting and formatting features, and all required student dataset files.
+
+
+# Student Grades Application – Final Release (v1.0)
+
+This project is a C++ application for processing large student datasets, computing final grades, sorting students, and dividing them into "passed" and "failed" groups.  
+The final version (v1.0) focuses on performance optimization, container comparison, and algorithmic efficiency as required in Task 3.
+
+---
+
+## 📌 Implemented Features
+
+- Reads student data from text files  
+- Calculates final grades  
+- Sorts students by final grade  
+- Splits students into "weak" (failed) and "strong" (passed) groups  
+- Exports results to CSV files  
+- Measures execution time for each stage:
+  - Reading
+  - Sorting
+  - Splitting
+  - Writing
+  - Total time
+
+- Supports three STL containers:
+  - `std::vector`
+  - `std::deque`
+  - `std::list`
+
+- Supports two processing strategies:
+  - Strategy 1 – Copy into two new containers  
+  - Strategy 2 – Move weak students and shrink the base container  
+
+- Uses STL algorithms from `<algorithm>` such as:
+  - `std::sort`
+  - `std::copy_if`
+  - `std::remove_if`
+  - `std::partition`
+
+---
+
+## 📂 Project Structure
+
