@@ -1,61 +1,196 @@
-# Student Grades App — Version v0.25
+📘 Student Grades Application — v1.0
+📌 Project Overview
 
-This version extends v0.2 by implementing **three separate container types**:
+This project is a C++ application developed to analyze the performance of different STL containers (std::vector, std::deque, std::list) when processing large student datasets.
 
-- `std::vector`
-- `std::list`
-- `std::deque`
+The program:
 
-The program measures the execution time of:
+Reads student data from a file
 
-1. Reading student data from file  
-2. Sorting students  
-3. Splitting into *passed* and *failed* groups  
-4. Writing results to output files  
+Sorts students by final grade
 
-This allows performance comparison between different C++ container types for large datasets (10K, 100K, 1M, and 10M students).
+Splits them into two groups: passed and failed
 
----
+Measures execution time of each stage
 
-## 📁 Project Structure
+Two different splitting strategies are implemented and compared.
 
-# Student Grades Application – Final Release (v1.0)
+This is the final optimized release (v1.0) for Task 3.
 
-This project is a C++ application for processing large student datasets, computing final grades, sorting students, and dividing them into "passed" and "failed" groups.  
-The final version (v1.0) focuses on performance optimization, container comparison, and algorithmic efficiency as required in Task 3.
+⚙️ Features
 
----
+Supports three containers: vector, deque, list
 
-## 📌 Implemented Features
+Implements two splitting strategies:
 
-- Reads student data from text files  
-- Calculates final grades  
-- Sorts students by final grade  
-- Splits students into "weak" (failed) and "strong" (passed) groups  
-- Exports results to CSV files  
-- Measures execution time for each stage:
-  - Reading
-  - Sorting
-  - Splitting
-  - Writing
-  - Total time
+Strategy 1: Copy students into two new containers
 
-- Supports three STL containers:
-  - `std::vector`
-  - `std::deque`
-  - `std::list`
+Strategy 2: Move failed students out and shrink base container
 
-- Supports two processing strategies:
-  - Strategy 1 – Copy into two new containers  
-  - Strategy 2 – Move weak students and shrink the base container  
+Uses STL algorithms: std::sort, std::copy_if, std::partition
 
-- Uses STL algorithms from `<algorithm>` such as:
-  - `std::sort`
-  - `std::copy_if`
-  - `std::remove_if`
-  - `std::partition`
+Measures time for:
 
----
+Reading
 
-## 📂 Project Structure
+Sorting
 
+Splitting
+
+Writing results
+
+Works with large datasets (10k – 1M students)
+
+🛠️ Build Instructions
+✅ Option 1 — Using Make (Linux / Unix)
+
+From the v1.0 directory:
+
+make clean
+make
+
+
+Run:
+
+./studentGrades_v025
+
+✅ Option 2 — Using CMake (Any OS)
+
+From the v1.0 directory:
+
+mkdir build
+cd build
+cmake ..
+make
+
+
+Run:
+
+./studentGrades
+
+▶️ How to Use the Application
+
+When the program starts, follow the prompts.
+
+1️⃣ Choose container:
+1) vector
+2) deque
+3) list
+
+2️⃣ Choose strategy:
+1) Strategy 1 (copy into two containers)
+2) Strategy 2 (move weak, shrink base)
+
+3️⃣ Enter input file:
+
+Example:
+
+students10000.txt
+students100000.txt
+students1000000.txt
+
+
+The program will display timing results and generate output CSV files:
+
+*_weak.csv
+
+*_strong.csv
+
+🧪 Test Datasets
+
+The following datasets were used:
+
+students10000.txt
+
+students100000.txt
+
+students1000000.txt
+
+📊 Benchmark Results Summary
+DATASET: students10000.txt
+
+Fastest:
+
+Container: vector
+
+Strategy: Strategy 2
+
+Slowest:
+
+Container: list
+
+Strategy: Strategy 2
+
+DATASET: students100000.txt
+
+Fastest:
+
+Container: vector
+
+Strategy: Strategy 2
+
+Slowest:
+
+Container: list
+
+Strategy: Strategy 2
+
+DATASET: students1000000.txt
+
+Fastest:
+
+Container: vector
+
+Strategy: Strategy 2
+
+Slowest:
+
+Container: list
+
+Strategy: Strategy 2
+
+🧠 Conclusions
+✅ Fastest container overall:
+
+std::vector
+
+Because:
+
+Contiguous memory
+
+Best cache performance
+
+Fastest sorting
+
+✅ Fastest strategy overall:
+
+Strategy 2 (move & shrink)
+
+Because:
+
+Less memory allocation
+
+Avoids copying all students twice
+
+Scales better for large files
+
+📈 Performance vs File Size
+
+As dataset size increased:
+
+Read time grew linearly
+
+Sorting became dominant after 100k students
+
+std::list degraded heavily due to pointer-based memory layout
+
+std::vector remained the most stable and fastest
+
+🗂 Project Structure
+v1.0/
+├── include/        # Header files
+├── src/            # Source files
+├── Makefile        # Unix build system
+├── CMakeLists.txt  # Cross-platform build system
+├── README.md       # Documentation
+└── students*.txt   # Test datasets
