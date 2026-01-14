@@ -1,17 +1,18 @@
-# Build outputs
-**/obj/
-*.o
-*.d
+# build folders
+obj/
+build/
 
-# Binaries
-studentGrades_v02
+# compiled programs
 studentGrades_v025
+studentGrades
 
-# Generated data files
-*.txt
-passed_*
-failed_*
-results/
+# object files
+*.o
 
-# VSCode / Codespaces
+# output data
+*.csv
+
+# editors / systems
 .vscode/
+.DS_Store
+

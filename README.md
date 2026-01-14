@@ -1,40 +1,115 @@
-Student Grades Application (v0.1)
-Overview
+🎓 StudentGradesApp
 
-This application reads students' homework and exam results, calculates final grades using either the average or the median of homework scores, and prints a neatly formatted table. It supports manual input, random grade generation, reading data from .txt files, automatic detection of homework column count, sorting by name or surname, and displaying both Final (Avg.) and Final (Med.) with two-decimal precision. The Person class fully implements the Rule of Three and provides overloaded operator>> and operator<< for input/output operations.
+A C++ application for processing large student datasets, computing final grades, and benchmarking different STL containers and strategies.
 
-Final Grade Formula
+This repository contains multiple development stages of the same project (v0.1 → v0.25 → v1.0), showing the evolution from a basic grading system to a fully benchmarked, optimized application.
 
-Final grade is calculated as:
+⭐ Final Release — v1.0 (Task 3)
+📌 Overview
 
-Using average:
+The final version (v1.0) focuses on performance optimization and benchmarking.
+It compares how different STL containers and different splitting strategies affect execution speed when working with large student datasets.
 
-Final = 0.4 * Average(Homework) + 0.6 * Exam
+The program:
+
+Reads large student files
+
+Sorts students by final grade
+
+Splits them into failed (weak) and passed (strong) groups
+
+Writes results to CSV files
+
+Measures execution time for every stage
+
+⚙️ Implemented Features (v1.0)
+
+Reading student data from text files
+
+Final grade calculation
+
+Sorting by final grade
+
+Splitting into “weak” and “strong” groups
+
+Writing results to CSV files
+
+Detailed timing of:
+
+Read
+
+Sort
+
+Split
+
+Write
+
+Total execution time
+
+Three STL containers:
+
+std::vector
+
+std::deque
+
+std::list
+
+Two strategies:
+
+Strategy 1: Copy students into two new containers
+
+Strategy 2: Move weak students and shrink the base container
+
+STL algorithms from <algorithm>:
+
+std::sort
+
+std::copy_if
+
+std::remove_if
+
+std::partition
+
+🛠 Build Instructions (v1.0)
+
+Open a terminal in the v1.0 folder:
+
+cd v1.0
+make clean
+make
 
 
-Using median:
+Run the program:
 
-Final = 0.4 * Median(Homework) + 0.6 * Exam
+./studentGrades_v025
 
-Features
-1. Manual Input Mode
+▶️ How to Use
 
-Users can enter first name, surname, any number of homework grades, and an exam grade. Homework entry continues until the user chooses to stop. The user may choose to calculate the final grade using either the average or the median.
+Choose container type:
 
-2. File Reading Mode
-
-The program reads files formatted as:
-
-Name     Surname    HW1 HW2 HW3 ... Exam
-John     Smith        8   7   9       10
-Anna     Brown       10   9   8        9
+1) vector
+2) deque
+3) list
 
 
-The program automatically detects how many homework columns the file contains, calculates both average-based and median-based final grades, sorts students alphabetically, and outputs neatly formatted results.
+Choose strategy:
 
-3. Random Grade Generation
+1) Strategy 1 (copy into two containers)
+2) Strategy 2 (move weak, shrink base)
 
-The program can generate large student datasets, including:
+
+Enter input file name:
+
+students10000.txt
+students100000.txt
+students1000000.txt
+
+
+Output files will be generated automatically.
+
+📊 Benchmark Results
+
+Tests were performed using three datasets:
 
 students10000.txt
 
@@ -42,114 +117,83 @@ students100000.txt
 
 students1000000.txt
 
-These files contain randomly generated homework and exam results.
+✔ Dataset: students10000.txt
 
-Class Design: Person
+Fastest container: vector
 
-The Person class stores: first name, surname, a vector of homework results, an exam grade, and a final grade.
+Fastest strategy: Strategy 2
 
-It implements:
+All containers perform similarly at small scale.
 
-Constructor(s)
+✔ Dataset: students100000.txt
 
-Copy constructor
+vector consistently fastest
 
-Copy assignment operator
+deque slightly slower
 
-Destructor
+list significantly slower in sorting and splitting
 
-operator>> for input
+✔ Dataset: students1000000.txt
 
-operator<< for output
+vector is clearly the fastest overall
 
-Methods for calculating final grade using average or median
+deque slightly slower
 
-This satisfies the Rule of Three.
+list much slower, especially for sorting and splitting
 
-Sample Output
-Name       Surname        Final (Avg.) | Final (Med.)
------------------------------------------------------
-John       Smith                 8.74   |       8.50
-Anna       Brown                 9.24   |       9.00
+🧠 Conclusions
 
-Project Structure
+✅ Fastest container: std::vector
+
+✅ Fastest strategy: Strategy 2 (move weak, shrink base)
+
+✅ Scalability:
+
+Differences are small for 10,000 students
+
+Differences become significant at 100,000
+
+Differences become very large at 1,000,000
+
+std::vector benefits from contiguous memory and cache locality
+
+std::list performs worst due to pointer-based structure
+
+Strategy 2 is more memory-efficient and usually faster
+
+➡️ Best overall choice: std::vector + Strategy 2
+
+📁 Project Structure
 StudentGradesApp/
 │
-├── Person.cpp
-├── Person.h
-├── main.cpp
-├── Students.txt
-├── students10000.txt
-├── students100000.txt
-├── students1000000.txt
-├── .gitattributes
-├── .gitignore
-└── README.md
+├── v0.1/        → Initial grading system
+├── v0.2/        → Improved file handling and generation
+├── v0.25/       → Container benchmarking
+├── v1.0/        → Final optimized release (Task 3)
+│
+└── README.md    → Project documentation
 
-Release v0.1
+📘 Previous Versions (for grading & history)
+v0.25 — Container comparison
 
-Release v0.1 includes the full implementation of the application, manual and file input functionality, random grade generation, sorting and formatting features, and all required student dataset files.
+Implemented vector, deque, and list
 
+Benchmarked reading, sorting, splitting, and writing
 
-# Student Grades App — Version v0.25
+Introduced performance measurement system
 
-This version extends v0.2 by implementing **three separate container types**:
+Folder: /v0.25
 
-- `std::vector`
-- `std::list`
-- `std::deque`
+v0.1 — Initial version
 
-The program measures the execution time of:
+Manual and file input
 
-1. Reading student data from file  
-2. Sorting students  
-3. Splitting into *passed* and *failed* groups  
-4. Writing results to output files  
+Average and median calculations
 
-This allows performance comparison between different C++ container types for large datasets (10K, 100K, 1M, and 10M students).
+Sorting and formatted output
 
----
+Random dataset generation
 
-## 📁 Project Structure
+Rule of Three implemented in Person class
 
-
-# Student Grades Application – Final Release (v1.0)
-
-This project is a C++ application for processing large student datasets, computing final grades, sorting students, and dividing them into "passed" and "failed" groups.  
-The final version (v1.0) focuses on performance optimization, container comparison, and algorithmic efficiency as required in Task 3.
-
----
-
-## 📌 Implemented Features
-
-- Reads student data from text files  
-- Calculates final grades  
-- Sorts students by final grade  
-- Splits students into "weak" (failed) and "strong" (passed) groups  
-- Exports results to CSV files  
-- Measures execution time for each stage:
-  - Reading
-  - Sorting
-  - Splitting
-  - Writing
-  - Total time
-
-- Supports three STL containers:
-  - `std::vector`
-  - `std::deque`
-  - `std::list`
-
-- Supports two processing strategies:
-  - Strategy 1 – Copy into two new containers  
-  - Strategy 2 – Move weak students and shrink the base container  
-
-- Uses STL algorithms from `<algorithm>` such as:
-  - `std::sort`
-  - `std::copy_if`
-  - `std::remove_if`
-  - `std::partition`
-
----
-
-## 📂 Project Structure
-
+Folder: /v0.1

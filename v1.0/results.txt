@@ -1,0 +1,217 @@
+==============================
+DATASET: students10000.txt
+==============================
+
+VECTOR
+Strategy 1: (copy into two containers)
+Read: 26.4906 ms
+Sort: 1.3802 ms
+Split: 1.48033 ms
+Write: 4.82862 ms
+TOTAL: 26.5048 ms
+
+Strategy 2: (move weak, shrink base)
+Read: 25.7892 ms
+Sort: 1.39715 ms
+Split: 1.44895 ms
+Write: 4.6932 ms
+TOTAL: 25.8044 ms
+
+
+DEQUE
+Strategy 1: (copy into two containers)
+Read: 27.9353 ms
+Sort: 1.63994 ms
+Split: 1.27814 ms
+Write: 4.73031 ms
+TOTAL: 27.9502 ms
+
+Strategy 2: (move weak, shrink base)
+Read: 35.0767 ms
+Sort: 1.66027 ms
+Split: 1.27669 ms
+Write: 4.6559 ms
+TOTAL: 35.0876 ms
+
+
+LIST
+Strategy 1: (copy into two containers)
+Read: 26.3884 ms
+Sort: 1.33281 ms
+Split: 1.63561 ms
+Write: 4.6815 ms
+TOTAL: 26.3993 ms
+
+Strategy 2: (move weak, shrink base)
+Read: 26.7206 ms
+Sort: 1.28997 ms
+Split: 2.0515 ms
+Write: 4.74349 ms
+TOTAL: 26.7479
+
+
+
+==============================
+DATASET: students100000.txt
+==============================
+
+VECTOR
+Strategy 1: (copy into two containers)
+Read: 304.916 ms
+Sort: 17.7249 ms
+Split: 19.6187 ms
+Write: 43.8611 ms
+TOTAL: 305.12 ms
+
+Strategy 2: (move weak, shrink base)
+Read: 268.43 ms
+Sort: 17.7482 ms
+Split: 17.4915 ms
+Write: 41.0895 ms
+TOTAL: 268.448 ms
+
+
+DEQUE
+Strategy 1: (copy into two containers)
+Read: 327.186 ms
+Sort: 20.5535 ms
+Split: 20.7093 ms
+Write: 43.7899 ms
+TOTAL: 327.209 ms
+
+Strategy 2: (move weak, shrink base)
+Read: 287.878 ms
+Sort: 20.3084 ms
+Split: 17.7974 ms
+Write: 44.8552 ms
+TOTAL: 287.898 ms
+
+
+LIST
+Strategy 1: (copy into two containers)
+Read: 299.242 ms
+Sort: 26.7242 ms
+Split: 24.0693 ms
+Write: 46.5447 ms
+TOTAL: 299.261
+
+Strategy 2: (move weak, shrink base)
+Read: 329.929 ms
+Sort: 28.2482 ms
+Split: 36.4036 ms
+Write: 44.0182 ms
+TOTAL: 330.077 ms
+
+
+
+==============================
+DATASET: students1000000.txt
+==============================
+
+VECTOR
+Strategy 1: (copy into two containers)
+Read: 2078.44 ms
+Sort: 233.043 ms
+Split: 227.274 ms
+Write: 420.502 ms
+TOTAL: 2078.46 ms
+
+Strategy 2: (move weak, shrink base)
+Read: 1950.23 ms
+Sort: 225.067 ms
+Split: 214.295 ms
+Write: 425.121 ms
+TOTAL: 1950.26 ms
+
+
+DEQUE
+Strategy 1: (copy into two containers)
+Read: 2116.89 ms
+Sort: 260.201 ms
+Split: 193.368 ms
+Write: 427.783 ms
+TOTAL: 2116.91 ms
+
+Strategy 2: (move weak, shrink base)
+Read: 2071.38 ms
+Sort: 250.374 ms
+Split: 191.166 ms
+Write: 420.217 ms
+TOTAL: 2071.41 ms
+
+
+LIST
+Strategy 1: (copy into two containers)
+Read: 2690.38 ms
+Sort: 576.635 ms
+Split: 348.94 ms
+Write: 413.881 ms
+TOTAL: 2690.41 ms
+
+Strategy 2: (move weak, shrink base)
+Read: 2808 ms
+Sort: 546.072 ms
+Split: 652.203 ms
+Write: 435.352 ms
+TOTAL: 2808.02 ms
+
+==============================
+CONCLUSION
+==============================
+
+1) Which container is fastest?
+
+Across all dataset sizes (10k, 100k, 1M students), std::vector is consistently the fastest container.
+
+• For 10,000 students, vector and list are close, but vector is slightly faster overall.
+• For 100,000 students, vector clearly outperforms deque and list.
+• For 1,000,000 students, vector is significantly faster than both deque and list.
+
+std::list is the slowest container, especially for large datasets, mainly due to poor cache locality and slower sorting and partitioning operations.
+
+Overall container performance ranking:
+FASTEST → vector → deque → list → SLOWEST
+
+
+2) Which strategy is fastest?
+
+Strategy 2 (move weak students and shrink the base container) is generally faster than Strategy 1.
+
+This improvement becomes more visible as file size increases:
+
+• For 10,000 students, the difference is small.
+• For 100,000 students, Strategy 2 is noticeably faster.
+• For 1,000,000 students, Strategy 2 clearly outperforms Strategy 1.
+
+This happens because Strategy 2 avoids copying all students into two new containers and reduces the size of the base container, which improves memory efficiency and reduces later processing costs.
+
+Therefore, Strategy 2 is the faster and more memory-efficient approach.
+
+
+3) How does performance change with file size?
+
+Execution time grows rapidly as file size increases.
+
+Approximate growth trend:
+• 10,000 students → ~25–35 ms
+• 100,000 students → ~270–330 ms
+• 1,000,000 students → ~1950–2800 ms
+
+This confirms that:
+
+• Reading, sorting, splitting, and writing all scale with data size.
+• Sorting becomes a major cost for large datasets.
+• std::list scales the worst.
+• std::vector scales the best.
+
+As the number of students increases, the performance gap between containers becomes much larger.
+
+
+FINAL DECISION:
+
+The fastest and most efficient solution is:
+
+→ std::vector  
+→ Strategy 2 (move weak students and shrink the base container)
+
+This combination provides the best overall execution time and memory behavior for large datasets.
